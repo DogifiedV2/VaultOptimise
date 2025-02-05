@@ -3,6 +3,7 @@ package com.dog.vaultoptimise.commands;
 import com.dog.vaultoptimise.saving.AutoSaveHandler;
 import com.mojang.brigadier.Command;
 import com.mojang.logging.LogUtils;
+import iskallia.vault.block.DungeonDoorBlock;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class MainCommand {
 
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static boolean vaultsLocked = false;
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
@@ -34,6 +36,8 @@ public class MainCommand {
                 .requires(source -> source.hasPermission(2)) // Requires permission level 2
                 .then(Commands.literal("lockdown")
                         .executes(MainCommand::toggleLockdown))
+                .then(Commands.literal("lockvaults")
+                        .executes(MainCommand::lockVaults))
                 .then(Commands.literal("saves")
                         .then(Commands.literal("manualsave")
                                 .executes(MainCommand::executeManualSave))
@@ -49,6 +53,15 @@ public class MainCommand {
     // ** COMMANDS ** //
     // ** // ** // ** //
     // ** // ** // ** //
+
+    private static int lockVaults(CommandContext<CommandSourceStack> context) {
+        vaultsLocked = !vaultsLocked;
+        context.getSource().sendSuccess(
+                new TextComponent("Vaults have been " + (vaultsLocked ? "locked" : "unlocked") + "."),
+                true
+        );
+        return Command.SINGLE_SUCCESS;
+    }
 
 
     private static int toggleAutoSave(CommandContext<CommandSourceStack> context) {
@@ -96,6 +109,7 @@ public class MainCommand {
                 LOGGER.info("Completed saving dimension: " + dimensionName + " in " + levelDuration + " ms");
             } else {
                 LOGGER.info("Skipping dimension: " + level.dimension().location().toString());
+
             }
         }
 

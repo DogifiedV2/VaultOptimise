@@ -1,5 +1,6 @@
 package com.dog.vaultoptimise.saving;
 
+import com.dog.vaultoptimise.VaultOptimise;
 import com.dog.vaultoptimise.config.ServerConfig;
 import com.mojang.logging.LogUtils;
 import iskallia.vault.item.BoosterPackItem;
@@ -13,9 +14,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
+import org.lwjgl.system.CallbackI;
 import org.slf4j.Logger;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,7 +27,7 @@ import static com.dog.vaultoptimise.saving.VaultTracker.*;
 
 public class AutoSaveHandler {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = VaultOptimise.LOGGER;
     private static boolean autosaveEnabled = true;
     private static boolean autosaveCrash = false;
     public static boolean currentlySaving = false;
@@ -88,6 +91,15 @@ public class AutoSaveHandler {
         }
     }
 
+    List<String> dimensionsToSave = new LinkedList<>();
+    private boolean shouldSave(String string) {
+        if (dimensionsToSave.isEmpty()) {
+            dimensionsToSave = ServerConfig.CONFIG_VALUES.Dimensions.get();
+        }
+        if (string.contains("vault")) return false;
+        return dimensionsToSave.contains(string);
+    }
+
     private void performAutosave(MinecraftServer server) {
         server.getCommands().performCommand(
                 server.createCommandSourceStack(),
@@ -99,8 +111,8 @@ public class AutoSaveHandler {
         long startTime = System.nanoTime();
 
         for (ServerLevel level : server.getAllLevels()) {
-            if (level.dimension() == Level.OVERWORLD) {
-                String dimensionName = level.dimension().location().toString();
+            String dimensionName = level.dimension().location().toString();
+            if (shouldSave(dimensionName)) {
                 LOGGER.info("Saving chunks for dimension: " + dimensionName);
 
                 long levelStartTime = System.nanoTime();
@@ -124,7 +136,7 @@ public class AutoSaveHandler {
                 long levelDuration = TimeUnit.NANOSECONDS.toMillis(levelEndTime - levelStartTime);
                 LOGGER.info("Completed saving dimension: " + dimensionName + " in " + levelDuration + " ms");
             } else {
-                LOGGER.info("Skipping dimension: " + level.dimension().location().toString());
+                LOGGER.info("Skipping dimension: " + dimensionName);
             }
         }
 

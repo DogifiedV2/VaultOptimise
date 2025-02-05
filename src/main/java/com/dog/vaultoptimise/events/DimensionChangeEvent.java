@@ -31,8 +31,6 @@ public class DimensionChangeEvent {
         ServerPlayer player = (ServerPlayer) event.getPlayer();
         ServerLevel playerLevel = player.getLevel();
 
-        com.dog.vaultoptimise.VaultOptimise.logInfo(previousDimensionNamespace);
-        com.dog.vaultoptimise.VaultOptimise.logInfo(newDimensionNamespace);
         if (!previousDimensionNamespace.equals("minecraft") && newDimensionNamespace.equals("the_vault")) {
 
             Optional<Vault> vault = ServerVaults.get(playerLevel);

@@ -5,6 +5,10 @@ import com.dog.vaultoptimise.saving.AutoSaveHandler;
 import com.dog.vaultoptimise.events.AIControl;
 import com.dog.vaultoptimise.config.ServerConfig;
 import com.mojang.logging.LogUtils;
+import iskallia.vault.block.ScavengerAltarBlock;
+import iskallia.vault.core.vault.objective.OfferingBossObjective;
+import iskallia.vault.gear.item.VaultGearItem;
+import iskallia.vault.task.GodAltarTask;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -81,6 +85,7 @@ public class VaultOptimise {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             if (server.getPlayerList().isOp(player.getGameProfile())) {
                 player.sendMessage(new TextComponent(message), player.getUUID());
+
             }
         }
     }

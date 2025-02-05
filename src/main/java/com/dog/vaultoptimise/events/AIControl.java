@@ -4,118 +4,70 @@ import com.dog.vaultoptimise.config.ServerConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingEvent;
 
-import java.util.List;
-
 public class AIControl {
 
-    private static int spawnedMobsCount = 0;
-    private static int mobsAIdisabled = 0;
-    private static int mobsAIenabled = 0;
+    private static final int CHECK_INTERVAL = 100;
+    private static final double ACTIVATION_RADIUS = ServerConfig.CONFIG_VALUES.ActivationRadius.get();
+    private static final double VERTICAL_RADIUS = ServerConfig.CONFIG_VALUES.ActivationHeight.get();
 
-    public static int getSpawnedMobsCount() {
-        return spawnedMobsCount;
-    }
-
-    public static int getMobsAIdisabled() {
-        return mobsAIdisabled;
-    }
-
-    public static int getMobsAIenabled() {
-        return mobsAIenabled;
-    }
-
-
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onMobSpawn(LivingSpawnEvent.CheckSpawn event) {
-        if (event.getEntity() instanceof Mob mob) {
+        if (!isValidMob(event.getEntity())) return;
+        Mob mob = (Mob) event.getEntity();
 
-            if (event.getSpawnReason() == MobSpawnType.NATURAL) {
-                CompoundTag nbt = mob.getPersistentData();
-                nbt.putString("CustomSpawnReason", event.getSpawnReason().name());
-                mob.setCanPickUpLoot(false);
-            }
+        if (event.getSpawnReason() == MobSpawnType.SPAWNER) {
+            mob.setNoAi(true);
+        }
 
-            if (event.getSpawnReason() == MobSpawnType.SPAWNER) {
-                mob.setNoAi(true);
-            } else if(!isPlayerNearby(mob)) {
-                if (mob.isNoAi()) { return; }
-                mob.setNoAi(true);
-            }
+        if (event.getSpawnReason() == MobSpawnType.NATURAL) {
+            CompoundTag nbt = mob.getPersistentData();
+            mob.setCanPickUpLoot(false);
+            nbt.putString("CustomSpawnReason", event.getSpawnReason().name());
         }
     }
-
-    private static final int CHECK_INTERVAL = 100; // 5 seconds
 
     @SubscribeEvent
     public static void onMobUpdate(LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntity() instanceof Mob mob && mob.getLevel().dimension().equals(Level.OVERWORLD)) {
+        if (!isValidMob(event.getEntity())) return;
+        Mob mob = (Mob) event.getEntity();
 
-            if (mob.tickCount % CHECK_INTERVAL == 0) {
-                boolean playerNearby = isPlayerNearby(mob);
+        if (mob.tickCount % CHECK_INTERVAL != 0) return;
+        CompoundTag nbt = mob.getPersistentData();
 
-                CompoundTag nbt = mob.getPersistentData();
-
-       if (nbt.contains("CustomSpawnReason")) {
-                if (playerNearby) {
-                    if (!mob.isNoAi()) {
-                        return;
-                    }
-                    mob.setNoAi(false);
-                } else {
-                    if (mob.isNoAi()) { return; }
-                    mob.setNoAi(true);
-                }
-               }
-            }
-        }
+        if (!nbt.contains("CustomSpawnReason")) return;
+        boolean playerNearby = isPlayerNearby(mob);
+        mob.setNoAi(!playerNearby);
     }
 
     @SubscribeEvent
     public static void onMobItemCheck(LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntity() instanceof Mob mob && mob.getLevel().dimension().equals(Level.OVERWORLD)) {
-            ItemStack mainHandItem = mob.getMainHandItem();
-            ItemStack offHandItem = mob.getOffhandItem();
+        if (!(event.getEntity() instanceof Mob mob)) return;
+        if (mob.getLevel().dimension() != Level.OVERWORLD) return;
 
-            if (!mainHandItem.isEmpty() || !offHandItem.isEmpty()) {
-                CompoundTag nbt = mob.getPersistentData();
+        CompoundTag nbt = mob.getPersistentData();
+        if (!nbt.contains("CustomSpawnReason")) return;
 
-                if (nbt.contains("CustomSpawnReason")) {
-                mob.discard();
-            }
-            }
+        if (!mob.getMainHandItem().isEmpty() || !mob.getOffhandItem().isEmpty()) {
+            mob.discard();
         }
     }
 
-    private static final double ACTIVATION_RADIUS = ServerConfig.CONFIG_VALUES.ActivationRadius.get();
-    private static final double VERTICAL_RADIUS = ServerConfig.CONFIG_VALUES.ActivationHeight.get();
-
     private static boolean isPlayerNearby(Mob mob) {
-        List<? extends Player> players = mob.getLevel().players();
-        for (Player player : players) {
-            double dx = player.getX() - mob.getX();
-            double dz = player.getZ() - mob.getZ();
-            double horizontalDistanceSqr = dx * dx + dz * dz;
-
-            double dy = Math.abs(player.getY() - mob.getY());
-
-            // Verify if within both horizontal and vertical radius
-            if (horizontalDistanceSqr <= ACTIVATION_RADIUS * ACTIVATION_RADIUS && dy <= VERTICAL_RADIUS) {
-                return true;
-            }
+        for (Player player : mob.getLevel().players()) {
+            if (Math.abs(player.getY() - mob.getY()) > VERTICAL_RADIUS) continue;
+            if (player.distanceToSqr(mob) <= ACTIVATION_RADIUS * ACTIVATION_RADIUS) return true;
         }
         return false;
     }
 
-
-
-
-
+    private static boolean isValidMob(Object entity) {
+        return (entity instanceof Mob mob);
+    }
 }
