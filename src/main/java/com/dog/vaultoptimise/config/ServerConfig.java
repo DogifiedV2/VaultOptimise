@@ -18,26 +18,34 @@ public class ServerConfig {
     }
 
     public static class Config {
-        public final ForgeConfigSpec.BooleanValue AutoSaveLogs;
-        public final ForgeConfigSpec.BooleanValue AutoSaves;
+
+        public final ForgeConfigSpec.ConfigValue<Integer> chunkSaveDelay;
+        public final ForgeConfigSpec.ConfigValue<Integer> chunksPerTick;
+        public final ForgeConfigSpec.ConfigValue<Boolean> debugLogging;
+        public final ForgeConfigSpec.ConfigValue<Boolean> smoothSaving;
+        public final ForgeConfigSpec.ConfigValue<Boolean> pteroKill;
+
         public final ForgeConfigSpec.BooleanValue MobAIControl;
         public final ForgeConfigSpec.BooleanValue VaultRaidEffect;
-        public final ForgeConfigSpec.BooleanValue SafeSaving;
-        public final ForgeConfigSpec.BooleanValue LightUpdates;
         public final ForgeConfigSpec.DoubleValue ActivationRadius;
         public final ForgeConfigSpec.DoubleValue ActivationHeight;
         public final ForgeConfigSpec.ConfigValue<List<String>> ExemptUsernames;
-        public final ForgeConfigSpec.ConfigValue<List<String>> Dimensions;
 
         Config(ForgeConfigSpec.Builder builder) {
-            builder.push("Saves");
+            builder.push("Smooth Saving");
 
-            AutoSaves = builder.comment(" Asynchronously save the world every 5 minutes").define("AutoSaves", true);
-            SafeSaving = builder.comment(" Prevents players from entering portals while saves occur").define("SafeSaving", true);
-            AutoSaveLogs = builder.comment(" Enable in-game logs for auto saves (OP only)").define("AutoSaveLogs", false);
-            LightUpdates = builder.comment(" (Experimental) Light updates are a rare cause for async crashes. Enabling this will pause them during saves.").define("LightUpdates", false);
-            Dimensions = builder.comment(" List of dimensions the mod will save. To get a correct name, check your console logs, and copy the value after Skipping Dimension.\n Vault Dimensions are blacklisted.\n Example: [\"minecraft:overworld\", \"ae2:spatial_storage\", \"minecraft:the_nether\", \"minecraft:the_end\"]")
-                    .define("DimensionsToSave", new ArrayList<>(List.of("minecraft:overworld", "minecraft:the_nether", "minecraft:the_end")));
+            builder.comment("Enable smooth saving to prevent Minecraft's autosave from saving all chunks in one tick, causing lag spikes. This feature staggers chunk saves over 5 minutes, saving 10 per tick, ensuring smoother performance.");
+            this.smoothSaving = builder.define("smoothSaving", true);
+
+            builder.comment("Delay before your chunk is saved to disk. Defaults to 5 minutes // 300 seconds");
+            this.chunkSaveDelay = builder.defineInRange("chunkSaveDelay", 300, 100, 3600);
+
+            builder.comment("Amount of chunks to be saved per tick. You can increment this, but 10 is recommended; 5 minutes have 6000 ticks, which can save 60,000 chunks.");
+            this.chunksPerTick = builder.defineInRange("chunksPerTick", 10, 5, 100);
+
+            builder.comment("Enables debug logging. Intended for testing purposes, this will spam your console. Hard.");
+            this.debugLogging = builder.define("debugLogging", false);
+
 
             builder.pop();
             builder.push("AI Control");
@@ -53,6 +61,8 @@ public class ServerConfig {
             VaultRaidEffect = builder.comment(" Remove raid effects from users upon leaving the vault").define("VaultRaidEffect", false);
             ExemptUsernames = builder.comment(" List of users that will not be kicked during lockdown.")
                     .define("ExemptUsernames", new ArrayList<>(List.of("Admin", "YourUsernameHere")));
+
+            pteroKill = builder.comment(" DEDICATED Pterodactyl only! Vault Hunter pterodactyl servers dont tend to fully shut down after the minecraft server does. This will make sure it does.").define("pteroKill", false);
 
 
             builder.pop();

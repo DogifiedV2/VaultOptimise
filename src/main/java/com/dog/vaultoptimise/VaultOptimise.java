@@ -1,14 +1,10 @@
 package com.dog.vaultoptimise;
 
 import com.dog.vaultoptimise.events.DimensionChangeEvent;
-import com.dog.vaultoptimise.saving.AutoSaveHandler;
 import com.dog.vaultoptimise.events.AIControl;
 import com.dog.vaultoptimise.config.ServerConfig;
+import com.dog.vaultoptimise.events.LogListener;
 import com.mojang.logging.LogUtils;
-import iskallia.vault.block.ScavengerAltarBlock;
-import iskallia.vault.core.vault.objective.OfferingBossObjective;
-import iskallia.vault.gear.item.VaultGearItem;
-import iskallia.vault.task.GodAltarTask;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,18 +17,22 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import org.lwjgl.system.CallbackI;
 import org.slf4j.Logger;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Mod("vaultoptimise")
 public class VaultOptimise {
 
-    private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-    private final AutoSaveHandler autoSaveHandler = new AutoSaveHandler();
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MODID = "vaultoptimise";
+    public static Random rand = new Random();
 
     public static void logInfo(String message) {
         LOGGER.info(message);
@@ -57,25 +57,37 @@ public class VaultOptimise {
     private void onServerStart(ServerStartingEvent event) {
         logInfo("Loading Events!");
 
-            if (ServerConfig.CONFIG_VALUES.AutoSaves.get()) {
-                MinecraftForge.EVENT_BUS.register(new AutoSaveHandler());
-                autoSaveHandler.startAutoSaveTask();
-                logInfo("Auto Save task started");
-            }
+        if (ServerConfig.CONFIG_VALUES.MobAIControl.get()) {
+            MinecraftForge.EVENT_BUS.register(AIControl.class);
+            logInfo("Mob AI Control started");
+        }
 
-            if (ServerConfig.CONFIG_VALUES.MobAIControl.get()) {
-                MinecraftForge.EVENT_BUS.register(AIControl.class);
-                logInfo("Mob AI Control started");
-            }
+        if (ServerConfig.CONFIG_VALUES.VaultRaidEffect.get()) {
+            MinecraftForge.EVENT_BUS.register(DimensionChangeEvent.class);
+            logInfo("Vault Raid fix started");
+        }
 
-            if (ServerConfig.CONFIG_VALUES.VaultRaidEffect.get()) {
-                MinecraftForge.EVENT_BUS.register(DimensionChangeEvent.class);
-                logInfo("Vault Raid fix started");
-            }
+        if (ServerConfig.CONFIG_VALUES.pteroKill.get()) {
+            VaultOptimise.LOGGER.info("Listening for server shutdown.");
+            LogListener.register();
+        }
     }
 
+    public static void forceKillProcess() {
+        try {
+            RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+            String pid = runtimeMxBean.getName().split("@")[0];
+            VaultOptimise.LOGGER.warn("Forcing process termination. PID: " + pid);
+            //Runtime.getRuntime().exec("kill -9 " + pid);
+            System.exit(0);
+        } catch (Exception e) {
+            VaultOptimise.LOGGER.error("Failed to kill process: " + e.getMessage(), e);
+        }
+    }
+
+
     private void onServerStop(ServerStoppingEvent event) {
-        executor.shutdownNow();
+
     }
 
     public static void sendMessageToOppedPlayers(String message) {

@@ -1,9 +1,7 @@
 package com.dog.vaultoptimise.commands;
 
-import com.dog.vaultoptimise.saving.AutoSaveHandler;
 import com.mojang.brigadier.Command;
 import com.mojang.logging.LogUtils;
-import iskallia.vault.block.DungeonDoorBlock;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
@@ -38,13 +36,6 @@ public class MainCommand {
                         .executes(MainCommand::toggleLockdown))
                 .then(Commands.literal("lockvaults")
                         .executes(MainCommand::lockVaults))
-                .then(Commands.literal("saves")
-                        .then(Commands.literal("manualsave")
-                                .executes(MainCommand::executeManualSave))
-                        .then(Commands.literal("toggleautosave")
-                                .executes(MainCommand::toggleAutoSave))
-                        .then(Commands.literal("togglesavelogs")
-                                .executes(MainCommand::toggleSaveLogs)))
         );
     }
 
@@ -60,17 +51,6 @@ public class MainCommand {
                 new TextComponent("Vaults have been " + (vaultsLocked ? "locked" : "unlocked") + "."),
                 true
         );
-        return Command.SINGLE_SUCCESS;
-    }
-
-
-    private static int toggleAutoSave(CommandContext<CommandSourceStack> context) {
-        boolean currentState = AutoSaveHandler.isAutosaveEnabled();
-        AutoSaveHandler.setAutosaveEnabled(!currentState);
-        if (context.getSource().getEntity() instanceof Player player) {
-            player.sendMessage(new TextComponent("Autosave has been " + (currentState ? "disabled" : "enabled") + "."), player.getUUID());
-            player.sendMessage(new TextComponent("Note: this is only applied until the server restarts. Please use the configuration to permanently toggle saving."), player.getUUID());
-        }
         return Command.SINGLE_SUCCESS;
     }
 

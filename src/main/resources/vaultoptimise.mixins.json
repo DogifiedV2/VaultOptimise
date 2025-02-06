@@ -5,9 +5,9 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "vaultoptimise.refmap.json",
   "mixins": [
-    "ServerPlayerMixin",
-    "MixinDynamicGraphMinFixedPoint",
-    "MixinVaultPortalBlock"
+    "ChunkAccessMixin",
+    "ChunkMapMixin",
+    "ServerChunkCacheMixin"
   ],
   "client": [
   ],
