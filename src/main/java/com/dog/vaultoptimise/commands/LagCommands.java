@@ -10,11 +10,13 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
@@ -61,35 +63,66 @@ public class LagCommands {
 
     private static void checkMobAiStatus(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        int aiOnCount = 0;
-        int aiOffCount = 0;
-        int otherMobs = 0;
+        int vaultAiOnCount = 0;
+        int vaultAiOffCount = 0;
+        int otherAiOnCount = 0;
+        int otherAiOffCount = 0;
+        int mobSpawnersCount = 0;
+        Map<String, Integer> mobs = new HashMap<>();
 
         for (ServerLevel level : source.getServer().getAllLevels()) {
+            // Get the dimension's path and check if it contains "vault" (case-insensitive)
+            String dimPath = level.dimension().location().getPath().toLowerCase();
+            boolean isVault = dimPath.contains("vault");
+
             for (Entity entity : level.getAllEntities()) {
-                if (entity instanceof Mob mob) {
+                if (entity instanceof PathfinderMob mob) {
                     CompoundTag nbt = mob.getPersistentData();
                     if (nbt.contains("CustomSpawnReason")) {
+                        mobs.merge(nbt.getString("CustomSpawnReason"), 1, Integer::sum);
                         if (mob.isNoAi()) {
-                            aiOffCount++;
+                            if (isVault) {
+                                vaultAiOffCount++;
+                            } else {
+                                otherAiOffCount++;
+                            }
                         } else {
-                            aiOnCount++;
+                            if (nbt.contains("spawner")) {
+                                mobSpawnersCount++;
+                            } else {
+                                if (isVault) {
+                                    vaultAiOnCount++;
+                                } else {
+                                    otherAiOnCount++;
+                                }
+                            }
                         }
-                    } else {
-                        otherMobs++;
                     }
                 }
             }
         }
 
-        source.sendSuccess(
-                new net.minecraft.network.chat.TextComponent("Mobs with AI on: " + aiOnCount), false);
-        source.sendSuccess(
-                new net.minecraft.network.chat.TextComponent("Mobs with AI off: " + aiOffCount), false);
-        source.sendSuccess(
-                new net.minecraft.network.chat.TextComponent("Other mobs: " + otherMobs), false);
+        // Create nicely formatted components with colors
+        Component vaultHeader = Component.nullToEmpty("Vault Dimensions:").copy().withStyle(ChatFormatting.GOLD);
+        Component vaultAiOnText = Component.nullToEmpty("  AI on: " + vaultAiOnCount).copy().withStyle(ChatFormatting.GREEN);
+        Component vaultAiOffText = Component.nullToEmpty("  AI off: " + vaultAiOffCount).copy().withStyle(ChatFormatting.RED);
+        Component otherHeader = Component.nullToEmpty("Other Dimensions:").copy().withStyle(ChatFormatting.GOLD);
+        Component otherAiOnText = Component.nullToEmpty("  AI on: " + otherAiOnCount).copy().withStyle(ChatFormatting.GREEN);
+        Component otherAiOffText = Component.nullToEmpty("  AI off: " + otherAiOffCount).copy().withStyle(ChatFormatting.RED);
+        Component spawnerText = Component.nullToEmpty("iSpawner mobs: " + mobSpawnersCount).copy().withStyle(ChatFormatting.RED);
 
+        // Send the messages to the command source
+        source.sendSuccess(vaultHeader, false);
+        source.sendSuccess(vaultAiOnText, false);
+        source.sendSuccess(vaultAiOffText, false);
+        source.sendSuccess(otherHeader, false);
+        source.sendSuccess(otherAiOnText, false);
+        source.sendSuccess(otherAiOffText, false);
+        source.sendSuccess(spawnerText, false);
+
+        System.out.println(mobs);
     }
+
 
     private static int checkItems(CommandContext<CommandSourceStack> context) {
         ServerLevel world = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);

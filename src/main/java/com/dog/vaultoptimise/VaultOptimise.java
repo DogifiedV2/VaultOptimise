@@ -17,15 +17,11 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import org.lwjgl.system.CallbackI;
 import org.slf4j.Logger;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Mod("vaultoptimise")
 public class VaultOptimise {

@@ -29,6 +29,7 @@ public class ServerConfig {
         public final ForgeConfigSpec.BooleanValue VaultRaidEffect;
         public final ForgeConfigSpec.DoubleValue ActivationRadius;
         public final ForgeConfigSpec.DoubleValue ActivationHeight;
+        public final ForgeConfigSpec.DoubleValue VaultActivationRadius;
         public final ForgeConfigSpec.ConfigValue<List<String>> ExemptUsernames;
 
         Config(ForgeConfigSpec.Builder builder) {
@@ -49,12 +50,17 @@ public class ServerConfig {
 
             builder.pop();
             builder.push("AI Control");
-            MobAIControl = builder.comment(" Mob AI will be controlled to reduce entity lag").define("MobAIControl", true);
+            MobAIControl = builder.comment(" Mob AI will be controlled to reduce entity lag.").define("MobAIControl", true);
             ActivationRadius = builder.comment("Distance that a player has to be before the AI is turned on (X and Z)")
                     .defineInRange("ActivationRadius", 48.0, 5.0, 500.0);
 
             ActivationHeight = builder.comment("Activation Radius but for the Y coordinate. Useful for caves.")
                     .defineInRange("ActivationHeight", 10.0, 5.0, 500.0);
+
+            VaultActivationRadius = builder.comment("Activation radius for mobs in the vault.")
+                    .defineInRange("VaultActivationHeight", 96.0, 48.0, 500.0);
+
+
 
             builder.pop();
             builder.push("Other");

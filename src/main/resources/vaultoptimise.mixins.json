@@ -8,7 +8,8 @@
     "ChunkAccessMixin",
     "ChunkMapMixin",
     "MixinVaultPortalBlock",
-    "ServerChunkCacheMixin"
+    "ServerChunkCacheMixin",
+    "SpawnerActionMixin"
   ],
   "client": [
   ],
