@@ -58,7 +58,7 @@ public class ServerConfig {
                     .defineInRange("ActivationHeight", 10.0, 5.0, 500.0);
 
             VaultActivationRadius = builder.comment("Activation radius for mobs in the vault.")
-                    .defineInRange("VaultActivationHeight", 96.0, 48.0, 500.0);
+                    .defineInRange("VaultActivationRadius", 96.0, 48.0, 500.0);
 
 
 
