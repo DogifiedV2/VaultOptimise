@@ -22,7 +22,6 @@ public class ServerConfig {
         public final ForgeConfigSpec.ConfigValue<Integer> chunkSaveDelay;
         public final ForgeConfigSpec.ConfigValue<Integer> chunksPerTick;
         public final ForgeConfigSpec.ConfigValue<Boolean> debugLogging;
-        public final ForgeConfigSpec.ConfigValue<Boolean> smoothSaving;
         public final ForgeConfigSpec.ConfigValue<Boolean> pteroKill;
 
         public final ForgeConfigSpec.BooleanValue MobAIControl;
@@ -31,12 +30,13 @@ public class ServerConfig {
         public final ForgeConfigSpec.DoubleValue ActivationHeight;
         public final ForgeConfigSpec.DoubleValue VaultActivationRadius;
         public final ForgeConfigSpec.ConfigValue<List<String>> ExemptUsernames;
+        public final ForgeConfigSpec.ConfigValue<String> webhookURL;
+        public final ForgeConfigSpec.ConfigValue<Boolean> pingOnCrash;
 
         Config(ForgeConfigSpec.Builder builder) {
             builder.push("Smooth Saving");
 
-            builder.comment("Enable smooth saving to prevent Minecraft's autosave from saving all chunks in one tick, causing lag spikes. This feature staggers chunk saves over 5 minutes, saving 10 per tick, ensuring smoother performance.");
-            this.smoothSaving = builder.define("smoothSaving", true);
+            builder.comment(" This feature staggers chunk saves over 5 minutes, saving 10+ per tick, ensuring smoother performance. This can not be disabled without uninstalling the mod.");
 
             builder.comment("Delay before your chunk is saved to disk. Defaults to 5 minutes // 300 seconds");
             this.chunkSaveDelay = builder.defineInRange("chunkSaveDelay", 300, 100, 3600);
@@ -60,6 +60,14 @@ public class ServerConfig {
             VaultActivationRadius = builder.comment("Activation radius for mobs in the vault.")
                     .defineInRange("VaultActivationRadius", 96.0, 48.0, 500.0);
 
+            builder.pop();
+            builder.push("Crash Detection");
+
+            webhookURL = builder.comment(" Paste a Discord Webhook URL in order to enable crash detection. Logs will be sent directly to discord.")
+                    .define("webhookURL", "");
+
+            pingOnCrash = builder.comment(" Whether to ping @everyone upon a crash (make your channel private..)")
+                    .define("PingOnCrash", false);
 
 
             builder.pop();

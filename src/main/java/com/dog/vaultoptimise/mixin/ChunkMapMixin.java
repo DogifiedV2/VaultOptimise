@@ -8,14 +8,11 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectCollection;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -121,7 +118,7 @@ public abstract class ChunkMapMixin {
                     }
                 }
             }
-            if (processed > 0 && ServerConfig.CONFIG_VALUES.debugLogging.get().booleanValue()) {
+            if (processed > 0 && ServerConfig.CONFIG_VALUES.debugLogging.get()) {
                 VaultOptimise.LOGGER.info("Amount of chunks processed: " + processed);
                 VaultOptimise.LOGGER.info("Amount of chunks checked: " + checked);
             }
@@ -167,5 +164,6 @@ public abstract class ChunkMapMixin {
 
     @Shadow
     public abstract void broadcast(Entity paramEntity, Packet<?> paramPacket);
+
 
 }

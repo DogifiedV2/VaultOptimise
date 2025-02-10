@@ -1,5 +1,6 @@
 package com.dog.vaultoptimise;
 
+import com.dog.vaultoptimise.events.CrashEvents;
 import com.dog.vaultoptimise.events.DimensionChangeEvent;
 import com.dog.vaultoptimise.events.AIControl;
 import com.dog.vaultoptimise.config.ServerConfig;
@@ -52,6 +53,11 @@ public class VaultOptimise {
 
     private void onServerStart(ServerStartingEvent event) {
         logInfo("Loading Events!");
+
+        if (CrashEvents.isValidWebhookURL(ServerConfig.CONFIG_VALUES.webhookURL.get())) {
+            MinecraftForge.EVENT_BUS.register(CrashEvents.class);
+            logInfo("Crash Detection started");
+        }
 
         if (ServerConfig.CONFIG_VALUES.MobAIControl.get()) {
             MinecraftForge.EVENT_BUS.register(AIControl.class);

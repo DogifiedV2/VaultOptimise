@@ -10,6 +10,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,6 +35,22 @@ public class SpawnerActionMixin {
             if (!isVault) {
                 CompoundTag nbt = entity.getPersistentData();
                 nbt.putBoolean("spawner", true);
+            }
+        }
+    }
+
+    @Inject(method = "applyEggOverride",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/item/ItemStack;getItem()Lnet/minecraft/world/item/Item;",
+                    shift = At.Shift.AFTER), cancellable = true)
+    private void denyAlexMobs(Level world, ItemStack stack, SpawnerContext context, CallbackInfoReturnable<Boolean> cir) {
+        Item entityItem = stack.getItem();
+        String registryName = entityItem.getRegistryName().toString();
+
+        if (registryName.startsWith("alexsmobs") || registryName.startsWith("eco")) {
+            if (!registryName.contains("flutter")) {
+                cir.setReturnValue(false);
+                return;
             }
         }
     }

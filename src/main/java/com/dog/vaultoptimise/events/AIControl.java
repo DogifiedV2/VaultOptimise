@@ -8,6 +8,9 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
@@ -70,8 +73,8 @@ public class AIControl {
 
         // Only vault mobs from this point.
         if (!isVault) return;
-
         mob.setCanPickUpLoot(false);
+
         if (nbt.contains("CustomSpawnReason")) return;
         nbt.putString("CustomSpawnReason", "VAULT");
     }
@@ -99,6 +102,7 @@ public class AIControl {
         mob.setNoAi(!playerNearby);
     }
 
+/*
     @SubscribeEvent
     public static void onMobItemCheck(LivingEvent.LivingUpdateEvent event) {
         if (!(event.getEntity() instanceof PathfinderMob mob)) return;
@@ -107,10 +111,17 @@ public class AIControl {
         CompoundTag nbt = mob.getPersistentData();
         if (!nbt.contains("CustomSpawnReason")) return;
 
+        if (mob instanceof Skeleton || mob instanceof Stray || mob instanceof WitherSkeleton ||
+                mob instanceof Pillager || mob instanceof Drowned || mob instanceof Piglin ||
+                mob instanceof PiglinBrute || mob instanceof ZombifiedPiglin || mob instanceof Vindicator) {
+            return;
+        }
+
         if (!mob.getMainHandItem().isEmpty() || !mob.getOffhandItem().isEmpty()) {
             mob.discard();
         }
     }
+ */
 
     private static boolean isPlayerNearby(PathfinderMob mob) {
         String dimension = mob.getLevel().dimension().location().getPath();
@@ -134,6 +145,7 @@ public class AIControl {
     }
 
     private static boolean isValidMob(Object entity) {
+        if (entity.getClass().getSimpleName().contains("SandSnapper")) return false;
         return (entity instanceof PathfinderMob);
     }
 

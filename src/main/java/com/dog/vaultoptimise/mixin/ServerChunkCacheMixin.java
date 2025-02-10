@@ -23,7 +23,7 @@ public class ServerChunkCacheMixin {
             target = "Lnet/minecraft/server/level/ServerChunkCache;runDistanceManagerUpdates()Z",
             shift = At.Shift.AFTER), cancellable = true)
     public void onSaveAllChunks(boolean force, CallbackInfo ci) {
-        if (!ServerConfig.CONFIG_VALUES.smoothSaving.get() || force) {
+        if (force) {
             return;
         }
 
