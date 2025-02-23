@@ -64,6 +64,11 @@ public class AIControl {
         CompoundTag nbt = mob.getPersistentData();
         boolean isVault = mob.getLevel().dimension().location().getPath().contains("vault");
 
+        if (!isVault && mob.getY() < 40 && !isPlayerNearby(mob)) {
+            event.setCanceled(true);
+            return;
+        }
+
         // Disable AI for iSpawner mobs.
         if (!isVault && nbt.contains("spawner")) {
             nbt.putString("CustomSpawnReason", "SPAWNER");

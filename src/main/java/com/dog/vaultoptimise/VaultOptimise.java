@@ -1,10 +1,7 @@
 package com.dog.vaultoptimise;
 
-import com.dog.vaultoptimise.events.CrashEvents;
-import com.dog.vaultoptimise.events.DimensionChangeEvent;
-import com.dog.vaultoptimise.events.AIControl;
+import com.dog.vaultoptimise.events.*;
 import com.dog.vaultoptimise.config.ServerConfig;
-import com.dog.vaultoptimise.events.LogListener;
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
@@ -62,6 +59,11 @@ public class VaultOptimise {
         if (ServerConfig.CONFIG_VALUES.MobAIControl.get()) {
             MinecraftForge.EVENT_BUS.register(AIControl.class);
             logInfo("Mob AI Control started");
+        }
+
+        if (ServerConfig.CONFIG_VALUES.extremeMode.get()) {
+            MobSpawningHandler.startSpawningSystem();
+            logInfo("Extreme Mob Control started");
         }
 
         if (ServerConfig.CONFIG_VALUES.VaultRaidEffect.get()) {

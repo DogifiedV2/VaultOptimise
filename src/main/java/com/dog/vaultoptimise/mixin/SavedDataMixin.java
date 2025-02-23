@@ -29,7 +29,7 @@ public class SavedDataMixin {
                 long durationMillis = (endTime - startTime) / 1_000_000;
 
                 long fileSize = file.exists() ? file.length() : -1;
-                if (fileSize > 10 && ServerConfig.CONFIG_VALUES.debugLogging.get()) {
+                if (durationMillis > 10 && ServerConfig.CONFIG_VALUES.debugLogging.get()) {
                     VaultOptimise.LOGGER.info("Saved file: {} | Size: {} bytes | Time taken: {} ms",
                             file.getName(), fileSize, durationMillis);
                 }

@@ -32,6 +32,7 @@ public class ServerConfig {
         public final ForgeConfigSpec.ConfigValue<List<String>> ExemptUsernames;
         public final ForgeConfigSpec.ConfigValue<String> webhookURL;
         public final ForgeConfigSpec.ConfigValue<Boolean> pingOnCrash;
+        public final ForgeConfigSpec.ConfigValue<Boolean> extremeMode;
 
         Config(ForgeConfigSpec.Builder builder) {
             builder.push("Smooth Saving");
@@ -60,6 +61,8 @@ public class ServerConfig {
             VaultActivationRadius = builder.comment("Activation radius for mobs in the vault.")
                     .defineInRange("VaultActivationRadius", 96.0, 48.0, 500.0);
 
+            extremeMode = builder.comment(" This will DRASTICALLY improve your tps, at the cost of only allowing a wave of mobs to spawn at night time. This does not affect world generation mobs, or mob spawners.")
+                            .define("extremeMode", false);
             builder.pop();
             builder.push("Crash Detection");
 

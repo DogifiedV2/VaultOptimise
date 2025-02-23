@@ -37,6 +37,8 @@ public class LagCommands {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    public static boolean extremeMode = true;
+
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
@@ -47,8 +49,16 @@ public class LagCommands {
                         .then(Commands.literal("iteminfo")
                                 .executes(LagCommands::checkItems))
                         .then(Commands.literal("mobinfo")
-                                .executes(LagCommands::returnMobInfo)))
+                                .executes(LagCommands::returnMobInfo))
+                        .then(Commands.literal("extrememode")
+                                .executes(LagCommands::disableExtremeMode)))
         );
+    }
+
+    private static int disableExtremeMode(CommandContext<CommandSourceStack> context) {
+        extremeMode = !extremeMode;
+        context.getSource().sendSuccess(new net.minecraft.network.chat.TextComponent("Extreme mode set to " + extremeMode), false);
+        return Command.SINGLE_SUCCESS;
     }
 
 
