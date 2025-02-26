@@ -118,7 +118,7 @@ public abstract class ChunkMapMixin {
                     }
                 }
             }
-            if (processed > 0) {
+            if (processed > 0 && ServerConfig.CONFIG_VALUES.debugLogging.get()) {
                 VaultOptimise.LOGGER.info("Amount of chunks processed: " + processed);
                 VaultOptimise.LOGGER.info("Amount of chunks checked: " + checked);
             }

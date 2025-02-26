@@ -1,7 +1,9 @@
 package com.dog.vaultoptimise.mixin;
 
 import com.dog.vaultoptimise.VaultOptimise;
+import com.dog.vaultoptimise.commands.LagCommands;
 import com.dog.vaultoptimise.config.ServerConfig;
+import net.minecraft.Util;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -12,6 +14,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.concurrent.TimeUnit;
+
+import static com.dog.vaultoptimise.VaultOptimise.LOGGER;
 
 @Mixin({ServerChunkCache.class})
 public class ServerChunkCacheMixin {
@@ -44,11 +50,20 @@ public class ServerChunkCacheMixin {
         saveTriggered = true;
 
         if (ServerConfig.CONFIG_VALUES.debugLogging.get()) {
-            VaultOptimise.LOGGER.info("A triggered chunk save has been canceled.");
+            LOGGER.info("A triggered chunk save has been canceled.");
         }
 
-        server.getPlayerList().saveAll();
-        VaultOptimise.LOGGER.info("Player data saved.");
+        if (LagCommands.asyncPlayerData) {
+            Util.ioPool().submit(() -> {
+                long startTime = System.nanoTime();
+                server.getPlayerList().saveAll();
+                LOGGER.info("Player data saved in {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
+            });
+        } else {
+            long startTime = System.nanoTime();
+            server.getPlayerList().saveAll();
+            LOGGER.info("Player data saved in {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
+        }
     }
 }
 

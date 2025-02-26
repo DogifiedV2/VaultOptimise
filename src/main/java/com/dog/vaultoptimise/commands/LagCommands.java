@@ -38,6 +38,7 @@ public class LagCommands {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public static boolean extremeMode = true;
+    public static boolean asyncPlayerData = true;
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
@@ -50,6 +51,8 @@ public class LagCommands {
                                 .executes(LagCommands::checkItems))
                         .then(Commands.literal("mobinfo")
                                 .executes(LagCommands::returnMobInfo))
+                        .then(Commands.literal("asyncplayerdata")
+                                .executes(LagCommands::disableExtremeMode))
                         .then(Commands.literal("extrememode")
                                 .executes(LagCommands::disableExtremeMode)))
         );
@@ -58,6 +61,12 @@ public class LagCommands {
     private static int disableExtremeMode(CommandContext<CommandSourceStack> context) {
         extremeMode = !extremeMode;
         context.getSource().sendSuccess(new net.minecraft.network.chat.TextComponent("Extreme mode set to " + extremeMode), false);
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int disableAsync(CommandContext<CommandSourceStack> context) {
+        asyncPlayerData = !asyncPlayerData;
+        context.getSource().sendSuccess(new net.minecraft.network.chat.TextComponent("asyncPlayerData mode set to " + asyncPlayerData), false);
         return Command.SINGLE_SUCCESS;
     }
 

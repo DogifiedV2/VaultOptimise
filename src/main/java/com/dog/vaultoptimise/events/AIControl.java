@@ -62,17 +62,18 @@ public class AIControl {
         PathfinderMob mob = (PathfinderMob) event.getEntity();
 
         CompoundTag nbt = mob.getPersistentData();
-        boolean isVault = mob.getLevel().dimension().location().getPath().contains("vault");
 
-        if (!isVault && mob.getY() < 40 && !isPlayerNearby(mob)) {
-            event.setCanceled(true);
-            return;
-        }
+        boolean isVault = mob.getLevel().dimension().location().getPath().contains("vault");
 
         // Disable AI for iSpawner mobs.
         if (!isVault && nbt.contains("spawner")) {
             nbt.putString("CustomSpawnReason", "SPAWNER");
             deleteMobAI(mob);
+            return;
+        }
+
+        if (!isVault && mob.getY() < 40 && !isPlayerNearby(mob)) {
+            event.setCanceled(true);
             return;
         }
 

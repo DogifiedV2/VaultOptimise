@@ -23,7 +23,9 @@ public class BotaniaCuriosHandler {
                     Item item = handler.getStackInSlot(i).getItem();
                     ResourceLocation itemId = item.getRegistryName();
                     if (itemId != null && itemId.getNamespace().equals("botania")) {
-                        handler.setStackInSlot(i, ItemStack.EMPTY);
+                        if (!itemId.toString().contains("cosmetic")) {
+                            handler.setStackInSlot(i, ItemStack.EMPTY);
+                        }
                     }
                 }
             });
