@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "vaultoptimise.refmap.json",
   "mixins": [
+    "CakeCrystalObjectiveMixin",
     "ChunkAccessMixin",
     "ChunkMapMixin",
     "MixinVaultPortalBlock",

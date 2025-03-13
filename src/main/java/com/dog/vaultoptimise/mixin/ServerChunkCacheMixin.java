@@ -57,12 +57,18 @@ public class ServerChunkCacheMixin {
             Util.ioPool().submit(() -> {
                 long startTime = System.nanoTime();
                 server.getPlayerList().saveAll();
-                LOGGER.info("Player data saved in {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
+                long time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+                if (time > 0) {
+                    LOGGER.info("Player data saved in {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
+                }
             });
         } else {
             long startTime = System.nanoTime();
             server.getPlayerList().saveAll();
-            LOGGER.info("Player data saved in {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
+            long time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
+            if (time > 0) {
+                LOGGER.info("Player data saved in {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime));
+            }
         }
     }
 }

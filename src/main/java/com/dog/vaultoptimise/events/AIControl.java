@@ -17,6 +17,7 @@ import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -87,6 +88,18 @@ public class AIControl {
 
         if (nbt.contains("CustomSpawnReason")) return;
         nbt.putString("CustomSpawnReason", "VAULT");
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void teleportEvent(EntityTeleportEvent event) {
+        if (event.getEntity() instanceof EnderMan mob) {
+            CompoundTag nbt = mob.getPersistentData();
+            boolean isVault = mob.getLevel().dimension().location().getPath().contains("vault");
+
+            if (!isVault && nbt.contains("spawner")) {
+                event.setCanceled(true);
+            }
+        }
     }
 
     @SubscribeEvent
