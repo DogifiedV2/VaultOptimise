@@ -41,7 +41,7 @@ public class CrashEvents {
                 if (ServerConfig.CONFIG_VALUES.pingOnCrash.get()) {
                     sendDiscordMessage("@everyone", WEBHOOK_URL);
                 }
-                sendDiscordMessage("Server crash detected.", WEBHOOK_URL);
+                sendDiscordMessage("Server crash detected on `" + ServerConfig.CONFIG_VALUES.serverName.get() + "`", WEBHOOK_URL);
                 File crashReport = getLatestCrashReport();
                 if (crashReport.exists()) {
                     sendDiscordFile("Crash report attached.", crashReport, WEBHOOK_URL);
