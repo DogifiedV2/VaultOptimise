@@ -32,17 +32,17 @@ public class LogListener extends AbstractAppender {
     public void append(LogEvent event) {
         String message = event.getMessage().getFormattedMessage();
 
-        if (event.getLoggerName().contains("net.minecraft.server.MinecraftServer") && message.contains("Stopping server")) {
+        if (event.getLoggerName().contains("MinecraftServer") && message.contains("Stopping server")) {
             VaultOptimise.LOGGER.warn("Stopping server detected");
             isShuttingDown = true;
         }
 
         if (isShuttingDown && message.contains("All dimensions are saved")) {
-            VaultOptimise.LOGGER.warn("Instance will shut down in 5 seconds.");
+            VaultOptimise.LOGGER.warn("Instance will shut down in 2 seconds.");
             scheduler.schedule(() -> {
                 VaultOptimise.LOGGER.warn("Stopping instance.");
                 VaultOptimise.forceKillProcess();
-            }, 5, TimeUnit.SECONDS);
+            }, 2, TimeUnit.SECONDS);
         }
     }
 

@@ -2,7 +2,6 @@ package com.dog.vaultoptimise.mixin;
 
 
 import com.dog.vaultoptimise.commands.MainCommand;
-import com.dog.vaultoptimise.config.ServerConfig;
 import iskallia.vault.block.VaultPortalBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ChatType;
@@ -17,6 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Map;
 import java.util.UUID;

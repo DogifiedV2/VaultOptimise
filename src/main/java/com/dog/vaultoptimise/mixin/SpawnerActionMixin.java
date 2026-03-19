@@ -1,7 +1,13 @@
 package com.dog.vaultoptimise.mixin;
 
+import com.dog.vaultoptimise.VaultOptimise;
 import iskallia.ispawner.world.spawner.SpawnerAction;
 import iskallia.ispawner.world.spawner.SpawnerContext;
+import iskallia.vault.core.vault.Vault;
+import iskallia.vault.core.vault.objective.Objective;
+import iskallia.vault.core.vault.objective.Objectives;
+import iskallia.vault.core.vault.objective.ParadoxObjective;
+import iskallia.vault.world.data.ServerVaults;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -19,10 +25,39 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Mixin(SpawnerAction.class)
 public class SpawnerActionMixin {
+
+    @Inject(method = "applyEggOverride",
+            at = @At("HEAD"),
+            cancellable = true, remap = false)
+    private void preventSpawningInBuildParadox(Level world, ItemStack stack, SpawnerContext context,
+                                               CallbackInfoReturnable<Boolean> cir) {
+        if (!world.isClientSide && isInBuildParadoxVault(world)) {
+            cir.setReturnValue(true);
+        }
+    }
+
+    private boolean isInBuildParadoxVault(Level world) {
+        if (world.isClientSide) return false;
+
+        return ServerVaults.get(world).map(vault -> {
+            Objectives objectives = vault.get(Vault.OBJECTIVES);
+            List<Objective> allObjectives = objectives.getAll(Objective.class);
+
+            for (Objective obj : allObjectives) {
+                if (obj instanceof ParadoxObjective paradoxObj) {
+                    return paradoxObj.get(ParadoxObjective.TYPE) == ParadoxObjective.Type.BUILD;
+                }
+            }
+            return false;
+        }).orElse(false);
+    }
+
 
     @Inject(method = "applyEggOverride",
             at = @At(value = "INVOKE",

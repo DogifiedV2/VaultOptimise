@@ -30,6 +30,7 @@ public class ServerConfig {
         public final ForgeConfigSpec.DoubleValue ActivationHeight;
         public final ForgeConfigSpec.DoubleValue VaultActivationRadius;
         public final ForgeConfigSpec.ConfigValue<List<String>> ExemptUsernames;
+        public final ForgeConfigSpec.ConfigValue<String> serverName;
         public final ForgeConfigSpec.ConfigValue<String> webhookURL;
         public final ForgeConfigSpec.ConfigValue<Boolean> pingOnCrash;
         public final ForgeConfigSpec.ConfigValue<Boolean> extremeMode;
@@ -65,6 +66,9 @@ public class ServerConfig {
                             .define("extremeMode", false);
             builder.pop();
             builder.push("Crash Detection");
+
+            serverName = builder.comment(" Name of your server.")
+                    .define("serverName", "lobby");
 
             webhookURL = builder.comment(" Paste a Discord Webhook URL in order to enable crash detection. Logs will be sent directly to discord.")
                     .define("webhookURL", "");

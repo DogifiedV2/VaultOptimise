@@ -26,6 +26,21 @@ public class vaultPlayer {
         return profile.getId();
     }
 
+    public static ServerPlayer getPlayerByUsername(String username) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) {
+            return null;
+        } else {
+            for(ServerPlayer player : server.getPlayerList().getPlayers()) {
+                if (player.getName().getString().equalsIgnoreCase(username)) {
+                    return player;
+                }
+            }
+
+            return null;
+        }
+    }
+
     public static String getNameFromUUID(String UUID, MinecraftServer server) {
         GameProfileCache profileCache = server.getProfileCache();
         GameProfile profile = profileCache.get(UUID).orElse(null);

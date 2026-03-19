@@ -199,30 +199,4 @@ public class AIControl {
                 entity instanceof GlowSquid;
     }
 
-    /**
-     * Event handler for entity spawning in the world
-     */
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    public static void onEntitySpawn(EntityJoinWorldEvent event) {
-        Entity entity = event.getEntity();
-
-        // Check if we're in a vault dimension
-        boolean isVaultDimension = event.getWorld().dimension().location().getPath().contains("vault");
-
-        // Only proceed if we're in a vault dimension and it's a passive mob from Minecraft
-        if (isVaultDimension && isVanillaPassiveMob(entity)) {
-            // Log the detected passive mob
-            VaultOptimise.LOGGER.warn("Detected vanilla passive mob in vault dimension: {} at coordinates [{}, {}, {}]",
-                    entity.getType().getRegistryName(),
-                    entity.getX(), entity.getY(), entity.getZ());
-
-            // You can add additional information if needed
-            if (entity instanceof LivingEntity living) {
-                VaultOptimise.LOGGER.info("  Health: {}, Motion: [{}, {}, {}]",
-                        living.getHealth(),
-                        living.getDeltaMovement().x, living.getDeltaMovement().y, living.getDeltaMovement().z);
-            }
-        }
-    }
-
 }
