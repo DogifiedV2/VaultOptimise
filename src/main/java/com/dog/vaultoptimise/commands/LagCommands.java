@@ -51,6 +51,8 @@ public class LagCommands {
                                 .executes(LagCommands::checkItems))
                         .then(Commands.literal("mobinfo")
                                 .executes(LagCommands::returnMobInfo))
+                        .then(Commands.literal("chunks")
+                                .executes(LagCommands::returnLoadedChunks))
                         .then(Commands.literal("asyncplayerdata")
                                 .executes(LagCommands::disableExtremeMode))
                         .then(Commands.literal("extrememode")
@@ -77,6 +79,25 @@ public class LagCommands {
         } else {
             context.getSource().sendSuccess(new net.minecraft.network.chat.TextComponent("This feature is not enabled in your config."), false);
         }
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int returnLoadedChunks(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        int totalLoadedChunks = 0;
+
+        source.sendSuccess(new TextComponent("Loaded chunks by active dimension:"), false);
+        for (ServerLevel level : source.getServer().getAllLevels()) {
+            int loadedChunks = level.getChunkSource().getLoadedChunksCount();
+            totalLoadedChunks += loadedChunks;
+            source.sendSuccess(new TextComponent("  "
+                    + level.dimension().location()
+                    + ": "
+                    + loadedChunks
+                    + " loaded chunks"), false);
+        }
+
+        source.sendSuccess(new TextComponent("Total loaded chunks: " + totalLoadedChunks), false);
         return Command.SINGLE_SUCCESS;
     }
 
