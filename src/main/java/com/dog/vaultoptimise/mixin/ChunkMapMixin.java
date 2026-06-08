@@ -1,6 +1,7 @@
 package com.dog.vaultoptimise.mixin;
 
 import com.dog.vaultoptimise.VaultOptimise;
+import com.dog.vaultoptimise.backup.ChunkBackupManager;
 import com.dog.vaultoptimise.config.ServerConfig;
 import com.dog.vaultoptimise.world.IChunkTimeSave;
 import com.dog.vaultoptimise.world.PosTimeEntry;
@@ -13,9 +14,14 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ImposterProtoChunk;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.storage.ChunkStorage;
+import net.minecraft.world.level.chunk.storage.IOWorker;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -36,6 +42,9 @@ public abstract class ChunkMapMixin {
     private int checked = 0;
     private int processed = 0;
     private final int chunksPerTick = ServerConfig.CONFIG_VALUES.chunksPerTick.get();
+
+    @Unique
+    private boolean vaultOptimise$backupRegistered = false;
 
 
     @Redirect(
@@ -75,6 +84,12 @@ public abstract class ChunkMapMixin {
     public ObjectCollection<ChunkHolder> smoothChunksaveChunks(Long2ObjectLinkedOpenHashMap instance) {
         long currentGameTime = this.level.getGameTime();
 
+        if (!this.vaultOptimise$backupRegistered) {
+            IOWorker worker = ((ChunkStorageAccessor) (ChunkStorage) (Object) this).vaultOptimise$getWorker();
+            ChunkBackupManager.ensureRegistered(worker, this.level);
+            this.vaultOptimise$backupRegistered = true;
+        }
+
         // Every 64 ticks, iterate over all visible chunks and schedule them for saving if needed.
         if (currentGameTime % 64L == 0L) {
             checked = 0;
@@ -90,8 +105,8 @@ public abstract class ChunkMapMixin {
                 // Retrieve the chunk to be saved. If not available, skip
                 ChunkAccess chunkAccess = entry.getChunkToSave().getNow(null);
                 // Only process valid chunk types (ImposterProtoChunk or LevelChunk).
-                if (!(chunkAccess instanceof net.minecraft.world.level.chunk.ImposterProtoChunk)
-                        && !(chunkAccess instanceof net.minecraft.world.level.chunk.LevelChunk)) {
+                if (!(chunkAccess instanceof ImposterProtoChunk)
+                        && !(chunkAccess instanceof LevelChunk)) {
                     continue;
                 }
 

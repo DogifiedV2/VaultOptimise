@@ -35,6 +35,11 @@ public class ServerConfig {
         public final ForgeConfigSpec.ConfigValue<Boolean> pingOnCrash;
         public final ForgeConfigSpec.ConfigValue<Boolean> extremeMode;
 
+        public final ForgeConfigSpec.BooleanValue enableChunkBackups;
+        public final ForgeConfigSpec.BooleanValue enableSaveRecovery;
+        public final ForgeConfigSpec.BooleanValue enableLoadRecovery;
+        public final ForgeConfigSpec.BooleanValue debugSuppressRecovery;
+
         Config(ForgeConfigSpec.Builder builder) {
             builder.push("Smooth Saving");
 
@@ -85,6 +90,21 @@ public class ServerConfig {
 
             pteroKill = builder.comment(" DEDICATED Pterodactyl only! Vault Hunter pterodactyl servers dont tend to fully shut down after the minecraft server does. This will make sure it does.").define("pteroKill", false);
 
+
+            builder.pop();
+            builder.push("Chunk Backups");
+
+            builder.comment(" After every successful chunk save, asynchronously writes a backup of the chunk to disk. Backups are only created for chunks claimed in Open Parties and Claims (~1-2% of total chunks in a typical world).");
+            enableChunkBackups = builder.define("enableChunkBackups", true);
+
+            builder.comment(" When a chunk save throws ConcurrentModificationException (a buggy mod racing on NBT during write), automatically restore the chunk from its last good backup and retry the write. Disable to leave the chunk corrupted for forensic analysis.");
+            enableSaveRecovery = builder.define("enableSaveRecovery", true);
+
+            builder.comment(" When a chunk read fails (typically EOFException from a previously corrupted region sector), restore from backup if one exists. Backups are checked regardless of current claim status.");
+            enableLoadRecovery = builder.define("enableLoadRecovery", true);
+
+            builder.comment(" Testing only. When enabled, save-side recovery is skipped so a forced CME leaves the region file corrupted, letting you verify load-side recovery on the next read.");
+            debugSuppressRecovery = builder.define("debugSuppressRecovery", false);
 
             builder.pop();
         }
