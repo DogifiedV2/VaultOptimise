@@ -10,6 +10,8 @@ import net.minecraft.world.level.chunk.storage.RegionFileStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.IOException;
 import java.util.ConcurrentModificationException;
@@ -32,6 +34,11 @@ import java.util.ConcurrentModificationException;
  */
 @Mixin(IOWorker.class)
 public abstract class IOWorkerMixin {
+
+    @Inject(method = "close", at = @At("RETURN"))
+    private void vaultOptimise$unregisterClosedWorker(CallbackInfo ci) {
+        ChunkBackupManager.unregister((IOWorker) (Object) this);
+    }
 
     /**
      * Wraps RegionFileStorage.write inside IOWorker.runStore. Handles three

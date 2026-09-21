@@ -86,6 +86,16 @@ public final class ChunkBackupManager {
         return WORKER_TO_LEVEL.get(worker);
     }
 
+    /** Remove strong references after the worker has closed its mailbox and storage. */
+    public static void unregister(IOWorker worker) {
+        WORKER_TO_LEVEL.remove(worker);
+        forgetStorage(((IOWorkerAccessor) (Object) worker).vaultOptimise$getStorage());
+    }
+
+    public static void forgetStorage(RegionFileStorage storage) {
+        BACKUP_DIR_CACHE.remove(storage);
+    }
+
     /**
      * Trigger point invoked from the save mixin after a successful chunk write.
      * If chunk backups are enabled and the chunk is currently claimed in OPaC,

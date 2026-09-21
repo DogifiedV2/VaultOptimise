@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -31,6 +32,11 @@ import java.util.Optional;
 public abstract class RegionFileStorageMixin {
 
     private static final ThreadLocal<ChunkPos> CURRENT_READ_POS = new ThreadLocal<>();
+
+    @Inject(method = "close", at = @At("RETURN"))
+    private void vaultOptimise$forgetClosedStorage(CallbackInfo ci) {
+        ChunkBackupManager.forgetStorage((RegionFileStorage) (Object) this);
+    }
 
     /**
      * Captures the chunk pos being read so the redirect below can look up the

@@ -54,7 +54,7 @@ public class LagCommands {
                         .then(Commands.literal("chunks")
                                 .executes(LagCommands::returnLoadedChunks))
                         .then(Commands.literal("asyncplayerdata")
-                                .executes(LagCommands::disableExtremeMode))
+                                .executes(LagCommands::disableAsync))
                         .then(Commands.literal("extrememode")
                                 .executes(LagCommands::disableExtremeMode)))
         );

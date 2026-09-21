@@ -37,6 +37,7 @@ public class VaultOptimise {
         System.out.println("vaultoptimise constructor called.");
         MinecraftForge.EVENT_BUS.addListener(this::onServerStart);
         MinecraftForge.EVENT_BUS.addListener(this::onServerStop);
+        MinecraftForge.EVENT_BUS.addListener(AIControl::restoreDisabledControl);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
 
         // Commands and config

@@ -31,6 +31,7 @@ import java.util.UUID;
 public class AIControl {
 
     private static final int CHECK_INTERVAL = 100;
+    private static final String SUSPENDED_AI = "VaultOptimiseAiSuspended";
     private static final double ACTIVATION_RADIUS = ServerConfig.CONFIG_VALUES.ActivationRadius.get();
     private static final double VERTICAL_RADIUS = ServerConfig.CONFIG_VALUES.ActivationHeight.get();
 
@@ -104,6 +105,7 @@ public class AIControl {
 
     @SubscribeEvent
     public static void onMobUpdate(LivingEvent.LivingUpdateEvent event) {
+        if (event.getEntity().level.isClientSide) return;
         if (!isValidMob(event.getEntity())) return;
         PathfinderMob mob = (PathfinderMob) event.getEntity();
 
@@ -120,9 +122,28 @@ public class AIControl {
             nbt.putString("CustomSpawnReason", isVault ? "VAULT" : mob.getClass().getSimpleName());
         }
 
-        // Toggle AI based on player proximity.
-        boolean playerNearby = isPlayerNearby(mob);
-        mob.setNoAi(!playerNearby);
+        // Only restore AI that this mod suspended. Keep pre-existing NoAI intact.
+        if (isPlayerNearby(mob)) {
+            restoreOwnedAi(mob);
+        } else if (!mob.isNoAi()) {
+            nbt.putBoolean(SUSPENDED_AI, true);
+            mob.setNoAi(true);
+        }
+    }
+
+    private static void restoreOwnedAi(PathfinderMob mob) {
+        if (mob.getPersistentData().getBoolean(SUSPENDED_AI)) {
+            mob.getPersistentData().remove(SUSPENDED_AI);
+            mob.setNoAi(false);
+        }
+    }
+
+    /** Release persisted suspension when AI control is disabled in the config. */
+    public static void restoreDisabledControl(EntityJoinWorldEvent event) {
+        if (event.getEntity() instanceof PathfinderMob mob && !mob.level.isClientSide
+                && !ServerConfig.CONFIG_VALUES.MobAIControl.get()) {
+            restoreOwnedAi(mob);
+        }
     }
 
 /*
