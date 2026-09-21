@@ -3,3 +3,7 @@
 /build/
 /build/classes/java/main/
 /.idea/
+/logs/
+*.log
+/src/test/
+/applesilicon.gradle

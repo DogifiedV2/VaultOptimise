@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "com.dog.vaultoptimise.mixin.decocraft",
+  "plugin": "com.dog.vaultoptimise.mixin.decocraft.DecocraftDedupMixinPlugin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": ["ModuleBlocksDedupScopeMixin", "BBModelLoaderSourceDedupMixin"],
+  "injectors": {"defaultRequire": 1}
+}
