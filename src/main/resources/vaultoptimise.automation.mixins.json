@@ -1,0 +1,27 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "com.dog.vaultoptimise.mixin.automation",
+  "plugin": "com.dog.vaultoptimise.mixin.automation.AutomationMixinPlugin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "vaultoptimise.refmap.json",
+  "mixins": [
+    "building.SteelToCoalGuardMixin",
+    "building.CoalToSteelGuardMixin",
+    "powah.IgnoredRedstoneMixin",
+    "botany.RecipeManagerAccessor",
+    "botany.BotanyRecipeListsMixin",
+    "ae2.CompositeStorageInventoryCacheMixin",
+    "ae2.StorageServiceWatcherDiffMixin",
+    "pipez.OrderedDrawerInsertionMixin",
+    "drawers.DrawerItemHandlerMixin",
+    "drawers.StandardDrawerGroupMixin",
+    "drawers.CompactingDrawerGroupMixin",
+    "drawers.DrawerControllerMixin",
+    "drawers.DrawerSlaveMixin",
+    "vaultfilters.VFTestsInvoker",
+    "vaultfilters.VFCacheMixin",
+    "vault.DiffuserUnusedScanMixin"
+  ],
+  "injectors": {"defaultRequire": 1}
+}
