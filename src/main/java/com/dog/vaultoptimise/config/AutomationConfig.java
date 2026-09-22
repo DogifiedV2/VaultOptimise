@@ -17,10 +17,7 @@ public final class AutomationConfig {
         STEEL_TO_IRON("steelToIronGuard"),
         POWAH_REDSTONE("powahIgnoredRedstone"),
         BOTANY_RECIPES("botanyRecipeLookup"),
-        AE2_INVENTORY("ae2InventoryComparison"),
-        AE2_WATCHERS("ae2WatcherDiff"),
         VAULT_FILTERS("vaultFiltersCache"),
-        PIPEZ_DRAWERS("pipezDrawersInsertion"),
         DIFFUSER("diffuserUnusedScan");
 
         public final String key;

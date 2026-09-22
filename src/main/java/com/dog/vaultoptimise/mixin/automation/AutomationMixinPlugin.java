@@ -33,18 +33,9 @@ public final class AutomationMixinPlugin implements IMixinConfigPlugin {
                     configured(Patch.POWAH_REDSTONE) && enabled("powah") && versionMatches("powah", "3.0.8");
             case "botany.BotanyRecipeListsMixin", "botany.RecipeManagerAccessor" ->
                     configured(Patch.BOTANY_RECIPES) && enabled("botany") && versionMatches("botanypots", "8.1.32");
-            case "ae2.CompositeStorageInventoryCacheMixin" ->
-                    configured(Patch.AE2_INVENTORY) && enabled("ae2") && versionMatches("ae2", "11.7.6");
-            case "ae2.StorageServiceWatcherDiffMixin" ->
-                    configured(Patch.AE2_WATCHERS) && enabled("ae2") && enabled("ae2WatcherDiff") && versionMatches("ae2", "11.7.6");
             case "vaultfilters.VFCacheMixin", "vaultfilters.VFTestsInvoker" ->
                     configured(Patch.VAULT_FILTERS) && enabled("vaultfilters") && versionMatches("vaultfilters", "1.33.0")
                             && versionMatches("ae2", "11.7.6");
-            case "pipez.OrderedDrawerInsertionMixin", "drawers.DrawerItemHandlerMixin",
-                    "drawers.StandardDrawerGroupMixin", "drawers.CompactingDrawerGroupMixin",
-                    "drawers.DrawerControllerMixin", "drawers.DrawerSlaveMixin" ->
-                    configured(Patch.PIPEZ_DRAWERS) && enabled("pipezDrawers") && versionMatches("pipez", "1.18.2-1.1.5")
-                            && versionMatches("storagedrawers", "10.2.1");
             case "vault.DiffuserUnusedScanMixin" ->
                     configured(Patch.DIFFUSER) && enabled("diffuser") && versionMatches("the_vault", "1.18.2-3.21.62");
             default -> false;
