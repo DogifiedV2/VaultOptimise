@@ -83,8 +83,9 @@ public class VaultOptimise {
             RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
             String pid = runtimeMxBean.getName().split("@")[0];
             VaultOptimise.LOGGER.warn("Forcing process termination. PID: " + pid);
-            //Runtime.getRuntime().exec("kill -9 " + pid);
-            System.exit(0);
+            // halt, not exit: exit runs shutdown hooks, and Minecraft's hook waits for a server thread that another
+            // mod can block forever in ServerStoppedEvent (mc2discord's Discord shutdown call). The world is already saved here.
+            Runtime.getRuntime().halt(0);
         } catch (Exception e) {
             VaultOptimise.LOGGER.error("Failed to kill process: " + e.getMessage(), e);
         }
