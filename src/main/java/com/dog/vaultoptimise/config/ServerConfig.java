@@ -88,7 +88,7 @@ public class ServerConfig {
             ExemptUsernames = builder.comment(" List of users that will not be kicked during lockdown.")
                     .define("ExemptUsernames", new ArrayList<>(List.of("Admin", "YourUsernameHere")));
 
-            pteroKill = builder.comment(" DEDICATED Pterodactyl only! Vault Hunter pterodactyl servers dont tend to fully shut down after the minecraft server does. This will make sure it does.").define("pteroKill", false);
+            pteroKill = builder.comment(" DEDICATED Pterodactyl only! Vault Hunter pterodactyl servers dont tend to fully shut down after the minecraft server does. This will make sure it does.").define("pteroKill", true);
 
 
             builder.pop();
