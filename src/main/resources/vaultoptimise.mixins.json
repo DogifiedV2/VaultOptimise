@@ -17,10 +17,12 @@
     "RegionFileStorageMixin",
     "SavedDataMixin",
     "ServerChunkCacheMixin",
-    "SpawnerActionMixin"
+    "SpawnerActionMixin",
+    "ChunkMapViewDistanceMixin",
+    "DistanceManagerInvoker",
+    "DynViewWorldLoadMixin"
   ],
-  "client": [
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }
